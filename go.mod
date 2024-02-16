@@ -1,3 +1,3 @@
-module mkassets
+module mkcart
 
 go 1.22.0
