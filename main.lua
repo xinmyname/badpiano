@@ -1,3 +1,4 @@
+-- main
 function _init()
 	-- switch upper rom to ram, render sprite 0 opaque
 	poke(0x5f36,0x18)
@@ -10,10 +11,11 @@ end
 
 function _update()
 	keys_update()
-	audio_update()
+	audio_legacy_update()
 end
 
 function _draw()
 	cls()
 	keys_draw()
+	audio_draw()
 end
