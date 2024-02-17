@@ -13,10 +13,10 @@ function audio_update()
 
 	audio.buffered = stat(108)
 
-	if (audio.buffered<512) then
+	if audio.buffered < 512 then
 		local size = audio.pos - audio.len
 		
-		if (size < -256) then
+		if size < -256 then
 			size = 256
 		else
 			size *= -1
@@ -29,7 +29,7 @@ function audio_update()
 		
 		serial(0x808,audio.base,size)
 		
-		if (audio.playing) then
+		if audio.playing then
 			audio.pos += size
 		else
 			audio.pos = 0
