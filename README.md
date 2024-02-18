@@ -1,6 +1,8 @@
 # Bad Piano
 A polyphonic piano with multiple instruments.
 * Requires keyboard.
+* Pick from six instruments: epiano, harpsi, jazzy, midc, organ, piano
+* midc is a sine wave at 261.6256Hz - "middle c"
 * Press left/right arrows to select a new instrument.
 * Play notes with the following keys: 
 ```  
