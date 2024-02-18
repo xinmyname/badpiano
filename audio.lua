@@ -16,17 +16,13 @@ function audio_init()
 end
 
 function audio_update()
-
 	audio.buffered = stat(108)
 
 	if ((not audio.playing) or (audio.buffered>=(audio.buf_size*2))) return
 
 	memset(audio.base, 0x80, audio.buf_size)
 
-	local value
-	local stream
-	local sample
-	local size
+	local value,stream,sample,size
 
 	for p=0,audio.buf_size-1 do
 		value=peek(audio.base+p)
@@ -77,29 +73,6 @@ function audio_play(sample_name,rate)
 	audio.next_request_id = (audio.next_request_id+1)%256
 	audio.next_stream_idx += 1
 	if (audio.next_stream_idx==audio.num_streams+1) audio.next_stream_idx=1 
-end
-
-function audio_draw()
-	pal()
-	print(audio.playing, 0, 72)
-	print(audio.buffered, 64, 72)
-	for i=1,audio.num_streams do
-		local stream = audio.streams[i]
-		local y=80
-		print(i, (i-1)*24, y)
-		y+=8
-		print(flr(stream.pos), (i-1)*24, y)
-		y+=8
-		print(stream.len, (i-1)*24, y)
-		y+=8
-		if stream.pos>0 then
-			local request = stream.request
-			print(request.id, (i-1)*24, y)
-			y+=8
-			print(request.sample_name, (i-1)*24, y)
-			y+=8
-		end
-	end
 end
 
 function _init_audio_stream()
