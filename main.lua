@@ -11,7 +11,7 @@ end
 
 function _update()
 	keys_update()
-	audio_legacy_update()
+	audio_update()
 end
 
 function _draw()

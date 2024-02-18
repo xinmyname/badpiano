@@ -4,10 +4,9 @@ function audio_init()
 	audio.base=0x4300
 	audio.pos=0
 	audio.buffered=0
-	audio.src=nil
-	audio.len=0
 	audio.playing=false
 	audio.num_streams=4
+	audio.buf_size=256
 	audio.streams={}
 	audio.next_stream_idx=1
 	audio.next_request_id=1
@@ -17,46 +16,54 @@ function audio_init()
 	end
 end
 
-function audio_legacy_update()
-	if (not audio.playing) return
+function audio_update()
 
 	audio.buffered = stat(108)
 
-	if audio.buffered < 512 then
-		local size = audio.pos - audio.len
-		
-		if size < -256 then
-			size = 256
-		else
-			size *= -1
-			audio.playing=false
-		end		
-		
-		for i=1,size do
-			poke(audio.base+(i-1), ord(sub(audio.src,i+audio.pos,i+audio.pos)))
+	if ((not audio.playing) or (audio.buffered>=(audio.buf_size*2))) return
+
+	memset(audio.base+audio.pos, 0x80, audio.buf_size)
+
+	local value
+	local stream
+	local sample
+	local size
+
+	for p=0,audio.buf_size-1 do
+		value=peek(audio.base+p)
+
+		for s=1,audio.num_streams do
+			stream=audio.streams[s]
+			if stream.pos>0 then
+				if stream.pos<=stream.len then
+					sample=data.samples[stream.request.sample_name]
+					value+=ord(sub(sample,stream.pos,stream.pos))-128
+					stream.pos+=1
+				else
+					stream.pos=0
+					stream.len=0
+					stream.request.callback("stopped", stream.request.id)
+				end
+			end
 		end
-		
-		serial(0x808,audio.base,size)
-		
-		if audio.playing then
-			audio.pos += size
-		else
-			audio.pos = 0
-		end
+
+		if (value>255) value=255
+		if (value<0) value=0
+
+		poke(audio.base+p, value)
 	end
-end
 
-function audio_legacy_play(src)
-	audio.src=src
-	audio.len=#src
-	audio.playing=true
-end
+	serial(0x808,audio.base,audio.buf_size)
 
-function audio_update()
-	if (not audio.playing) return
+	local playing=false
+	for s=1,audio.num_streams do
+		if (audio.streams[s].pos>0) playing=true
+	end
+	audio.playing=playing
 end
 
 function audio_play(sample_name,rate,callback)
+	local sample = data.samples[sample_name]
 	local request={}
 	request.id=audio.next_request_id
 	request.sample_name=sample_name
@@ -65,30 +72,41 @@ function audio_play(sample_name,rate,callback)
 
 	local stream=audio.streams[audio.next_stream_idx]
 
-	if stream.playing then
-		callback("aborted", request.id)
+	if stream.pos>0 then
+		request.callback("aborted", request.id)
 	end
 
 	stream.request=request
-	stream.playing=true
+	stream.len=#sample
+	stream.pos=1
 
-	callback("started", request.id)
+	request.callback("started", request.id)
 
-	audio.next_request_id += 1
+	audio.playing=true
+	audio.next_request_id = (audio.next_request_id+1)%256
 	audio.next_stream_idx += 1
 	if (audio.next_stream_idx==audio.num_streams+1) audio.next_stream_idx=1 
 end
 
 function audio_draw()
 	pal()
+	print(audio.playing, 0, 72)
+	print(audio.buffered, 64, 72)
 	for i=1,audio.num_streams do
 		local stream = audio.streams[i]
-		print(i, (i-1)*24, 72)
-		print(stream.playing, (i-1)*24, 80)
-		if stream.playing then
+		local y=80
+		print(i, (i-1)*24, y)
+		y+=8
+		print(stream.pos, (i-1)*24, y)
+		y+=8
+		print(stream.len, (i-1)*24, y)
+		y+=8
+		if stream.pos>0 then
 			local request = stream.request
-			print(request.id, (i-1)*24, 88)
-			print(request.sample_name, (i-1)*24, 96)
+			print(request.id, (i-1)*24, y)
+			y+=8
+			print(request.sample_name, (i-1)*24, y)
+			y+=8
 		end
 	end
 end
@@ -96,6 +114,7 @@ end
 function _init_audio_stream()
 	local stream={}
 	stream.request={}
-	stream.playing=false
+	stream.len=0
+	stream.pos=0
 	return stream
 end
