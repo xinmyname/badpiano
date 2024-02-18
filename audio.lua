@@ -2,7 +2,6 @@
 function audio_init()
 	audio={}
 	audio.base=0x4300
-	audio.pos=0
 	audio.buffered=0
 	audio.playing=false
 	audio.num_streams=4
@@ -22,7 +21,7 @@ function audio_update()
 
 	if ((not audio.playing) or (audio.buffered>=(audio.buf_size*2))) return
 
-	memset(audio.base+audio.pos, 0x80, audio.buf_size)
+	memset(audio.base, 0x80, audio.buf_size)
 
 	local value
 	local stream
@@ -38,7 +37,7 @@ function audio_update()
 				if stream.pos<=stream.len then
 					sample=data.samples[stream.request.sample_name]
 					value+=ord(sub(sample,stream.pos,stream.pos))-128
-					stream.pos+=1
+					stream.pos+=stream.request.rate
 				else
 					stream.pos=0
 					stream.len=0
@@ -97,7 +96,7 @@ function audio_draw()
 		local y=80
 		print(i, (i-1)*24, y)
 		y+=8
-		print(stream.pos, (i-1)*24, y)
+		print(flr(stream.pos), (i-1)*24, y)
 		y+=8
 		print(stream.len, (i-1)*24, y)
 		y+=8

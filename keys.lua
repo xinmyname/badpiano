@@ -6,6 +6,21 @@ function keys_init()
 	keys.state={0,0,0,0,0,0,0,0,0,0,0,0}
 	keys.off_color={6,0,6,0,6,6,0,6,0,6,0,6}
 	keys.on_color={7,5,7,5,7,7,5,7,5,7,5,7}
+
+	keys.rates={
+		1.0000,
+		1.0595,
+		1.1225,
+		1.1892,
+		1.2599,
+		1.3348,
+		1.4142,
+		1.4983,
+		1.5874,
+		1.6818,
+		1.7818,
+		1.8877
+	}
 end
 
 function keys_update()
@@ -15,7 +30,7 @@ function keys_update()
 	for k=1,12 do
 		keys.state[k]=stat(28,keys.scan_codes[k]) and 1 or 0
 		if ((keys.last_state[k] == 0) and (keys.state[k] == 1)) then
-			audio_play("midc",1,keys_audio_callback)
+			audio_play("midc",keys.rates[k],keys_audio_callback)
 		end
 		keys.last_state[k] = keys.state[k]
 	end
