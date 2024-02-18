@@ -30,9 +30,12 @@ func main() {
 	p8.WriteString("--data\n")
 	p8.WriteString("data={}\n")
 	p8.WriteString("data.samples={}\n")
+	writeSampleData("Samples/epiano.u8", "data.samples.epiano", p8)
+	writeSampleData("Samples/harpsi.u8", "data.samples.harpsi", p8)
+	writeSampleData("Samples/jazzy.u8", "data.samples.jazzy", p8)
 	writeSampleData("Samples/midc.u8", "data.samples.midc", p8)
+	writeSampleData("Samples/organ.u8", "data.samples.organ", p8)
 	writeSampleData("Samples/piano.u8", "data.samples.piano", p8)
-
 	p8.WriteString("__gfx__\n")
 	p8.WriteString("1111111111102222222220333333333304444444440555555555500666666666607777777770888888888809999999990aaaaaaaaaa0bbbbbbbbb0cccccccccc\n")
 	p8.WriteString("1111111111102222222220333333333304444444440555555555500666666666607777777770888888888809999999990aaaaaaaaaa0bbbbbbbbb0cccccccccc\n")

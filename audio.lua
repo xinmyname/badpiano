@@ -41,7 +41,6 @@ function audio_update()
 				else
 					stream.pos=0
 					stream.len=0
-					stream.request.callback("stopped", stream.request.id)
 				end
 			end
 		end
@@ -61,25 +60,18 @@ function audio_update()
 	audio.playing=playing
 end
 
-function audio_play(sample_name,rate,callback)
+function audio_play(sample_name,rate)
 	local sample = data.samples[sample_name]
 	local request={}
 	request.id=audio.next_request_id
 	request.sample_name=sample_name
 	request.rate=rate
-	request.callback=callback
 
 	local stream=audio.streams[audio.next_stream_idx]
-
-	if stream.pos>0 then
-		request.callback("aborted", stream.request.id)
-	end
 
 	stream.request=request
 	stream.len=#sample
 	stream.pos=1
-
-	request.callback("started", request.id)
 
 	audio.playing=true
 	audio.next_request_id = (audio.next_request_id+1)%256

@@ -30,7 +30,7 @@ function keys_update()
 	for k=1,12 do
 		keys.state[k]=stat(28,keys.scan_codes[k]) and 1 or 0
 		if ((keys.last_state[k] == 0) and (keys.state[k] == 1)) then
-			audio_play("piano",keys.rates[k],keys_audio_callback)
+			audio_play("piano",keys.rates[k])
 		end
 		keys.last_state[k] = keys.state[k]
 	end
@@ -53,7 +53,4 @@ function keys_draw()
 		keys.last_state[k] = keys.state[k]
 	end
 
-end
-
-function keys_audio_callback(reason,request_id)
 end
