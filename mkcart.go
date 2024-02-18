@@ -8,13 +8,6 @@ import (
 )
 
 func main() {
-
-	midcbytes, err := os.ReadFile("mid-c.u8")
-
-	if err != nil {
-		log.Fatal(err.Error())
-	}
-
 	fmt.Println("Writing badpiano.p8...")
 
 	p8, err := os.Create("badpiano.p8")
@@ -37,9 +30,8 @@ func main() {
 	p8.WriteString("--data\n")
 	p8.WriteString("data={}\n")
 	p8.WriteString("data.samples={}\n")
-	p8.WriteString("data.samples.midc=\"")
-	writeBytesAsText(midcbytes, p8)
-	p8.WriteString("\"\n")
+	writeSampleData("Samples/midc.u8", "data.samples.midc", p8)
+	writeSampleData("Samples/piano.u8", "data.samples.piano", p8)
 
 	p8.WriteString("__gfx__\n")
 	p8.WriteString("1111111111102222222220333333333304444444440555555555500666666666607777777770888888888809999999990aaaaaaaaaa0bbbbbbbbb0cccccccccc\n")
@@ -168,4 +160,18 @@ func writeFileAsText(filename string, writer writer) error {
 	}
 
 	return nil
+}
+
+func writeSampleData(filename string, sampleName string, writer writer) {
+	bytes, err := os.ReadFile(filename)
+
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	writer.WriteString(sampleName)
+
+	writer.WriteString("=\"")
+	writeBytesAsText(bytes, writer)
+	writer.WriteString("\"\n")
 }
