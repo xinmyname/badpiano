@@ -12,7 +12,7 @@ A polyphonic piano with multiple instruments.
 * Up to four notes can be played simultaneously
 
 ## Build Instructions
-A Go script assembles a .p8 files from the Lua code and encodes the samples as strings. Execute `go run mkcart` to build the `badpiano.p8` file, then copy it into your cart folder.
+A Go script assembles a .p8 file from the Lua code and encodes the samples as strings. Execute `go run mkcart` to build the `badpiano.p8` file, then copy it into your cart folder.
 
 ## Caveats
 * It doesn't sound all that great.
