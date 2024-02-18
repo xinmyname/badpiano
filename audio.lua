@@ -36,7 +36,7 @@ function audio_update()
 			if stream.pos>0 then
 				if stream.pos<=stream.len then
 					sample=data.samples[stream.request.sample_name]
-					value+=ord(sub(sample,stream.pos,stream.pos))-128
+					value+=(ord(sub(sample,stream.pos,stream.pos))-128)*0.8
 					stream.pos+=stream.request.rate
 				else
 					stream.pos=0
@@ -72,7 +72,7 @@ function audio_play(sample_name,rate,callback)
 	local stream=audio.streams[audio.next_stream_idx]
 
 	if stream.pos>0 then
-		request.callback("aborted", request.id)
+		request.callback("aborted", stream.request.id)
 	end
 
 	stream.request=request
